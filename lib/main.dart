@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'dart:async';
+import 'dart:io';
+
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+
 
   // This widget is the root of your application.
   @override
@@ -50,22 +55,64 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  // 뒤로 가기 시 전 화면으로 이동하기 위함
+  WebViewController? _webViewController;
 
+  // 뒤로 가기 시 전 화면으로 이동하기 위함
+  final Completer<WebViewController> _completerController = Completer<WebViewController>();
 
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
 
-    return Scaffold(
+      onWillPop: () => _goBack(context),
+      child: Scaffold(
+        body: SafeArea(
+          child: WebView(
 
-      body: SafeArea(
+            // 뒤로 가기 시 전 화면으로 이동하기 위함
+            onWebViewCreated: (WebViewController webViewController) {
+              _completerController.future
+                  .then((value) => _webViewController = value);
 
-        child: WebView(
-          initialUrl: 'https://lululalazon.com',
-          javascriptMode: JavascriptMode.unrestricted,
+              _completerController.complete(webViewController);
+            },
+
+            // 접속할 Url
+            initialUrl: 'https://lululalazon.com',
+
+            // 자바스크립트 사용 여부
+            javascriptMode: JavascriptMode.unrestricted,
+
+            // 옆으로 스와이프해서 뒤로가기
+            gestureNavigationEnabled: true,
+
+            // 구글 로그인 시 정상 작동
+            userAgent: "random",
+          ),
+
         ),
       ),
-
     );
   }
+
+  // 뒤로 가기 시 전 화면으로 이동하기 위함
+  Future<bool> _goBack(BuildContext context) async {
+
+    if (_webViewController == null) {
+      return true;
+    }
+
+    if (await _webViewController!.canGoBack()) {
+      _webViewController!.goBack();
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
+
+  }
+
 }
+
+
