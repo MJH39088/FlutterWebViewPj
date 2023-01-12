@@ -78,16 +78,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
               _completerController.complete(webViewController);
             },
-
             // 접속할 Url
             initialUrl: 'https://lululalazon.com',
-
             // 자바스크립트 사용 여부
             javascriptMode: JavascriptMode.unrestricted,
-
             // 옆으로 스와이프해서 뒤로가기
             gestureNavigationEnabled: true,
-
             // 구글 로그인 시 정상 작동
             userAgent: "random",
           ),
